@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍽️ How-Dine Crisis: CVP Decision Challenge</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap');
+        
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255,255,255,0.95);
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --error: #ef4444;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --gold: #fbbf24;
+            --restaurant-red: #dc2626;
+            --restaurant-gold: #d97706;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute; display: block;
+            width: 20px; height: 20px;
+            background: rgba(255,255,255,0.1);
+            animation: float 25s linear infinite;
+            bottom: -150px; border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; width: 80px; height: 80px; }
+        .bg-animation span:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .bg-animation span:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; width: 20px; height: 20px; }
+        .bg-animation span:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-duration: 11s; }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+        }
+
+        .game-container { max-width: 950px; margin: 0 auto; padding: 1.5rem; }
+
+        .music-control {
+            position: fixed; top: 20px; right: 20px;
+            z-index: 1000; display: flex; gap: 10px;
+        }
+
+        .music-btn {
+            background: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            cursor: pointer; font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .music-btn:hover { transform: scale(1.1); }
+
+        header {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title .logo { font-size: 2.5rem; }
+        .game-title h1 {
+            font-size: 1.4rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--restaurant-red), var(--restaurant-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .game-title p { font-size: 0.85rem; color: var(--text-muted); }
+
+        .stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-item .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-item .value { font-size: 2rem; font-weight: 900; color: var(--primary); }
+        .stat-item .value.gold { color: var(--gold); }
+
+        .progress-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 500; }
+        .progress-bar-bg { height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #ef4444, #ec4899, #8b5cf6);
+            background-size: 300% 100%;
+            animation: gradientMove 3s ease infinite;
+            width: 0%; transition: width 0.5s ease; border-radius: 6px;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .level-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 0.5rem 1rem;
+            border-radius: 30px; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem;
+        }
+
+        .scenario-title {
+            font-size: 1.6rem; font-weight: 900;
+            color: var(--restaurant-red);
+            margin-bottom: 1rem;
+        }
+
+        .scenario-text {
+            font-size: 1rem; line-height: 1.9;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            border-left: 5px solid var(--accent);
+        }
+
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            margin: 1.5rem 0; font-size: 0.9rem;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--restaurant-red), var(--restaurant-gold));
+            color: white; padding: 12px 15px;
+            text-align: left; font-weight: 600;
+        }
+
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #e5e7eb; }
+        .data-table tr:nth-child(even) { background: #f9fafb; }
+        .data-table tr:hover { background: #fef3c7; }
+
+        .question-box {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            padding: 1.5rem; border-radius: 15px;
+            margin-top: 1.5rem; border: 2px solid var(--primary);
+        }
+
+        .question-text {
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 1.5rem;
+        }
+
+        .question-text::before { content: '❓ '; font-size: 1.3rem; }
+
+        .attempt-info {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: white; padding: 0.5rem 1rem;
+            border-radius: 20px; font-size: 0.85rem;
+            margin-bottom: 1rem; color: var(--text-muted);
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+
+        .option-btn {
+            background: white; border: 3px solid #e5e7eb;
+            color: var(--text-dark); padding: 1.2rem 1.5rem;
+            border-radius: 15px; cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left; font-size: 0.95rem;
+            display: flex; align-items: flex-start; gap: 1rem;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #f5f3ff;
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .option-btn .option-letter {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; width: 35px; height: 35px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: 700; flex-shrink: 0;
+        }
+
+        .option-btn.correct { border-color: var(--success); background: #d1fae5; }
+        .option-btn.correct .option-letter { background: var(--success); }
+        .option-btn.wrong { border-color: var(--error); background: #fee2e2; }
+        .option-btn.wrong .option-letter { background: var(--error); }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+
+        .feedback-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(5px);
+            padding: 1rem; overflow-y: auto;
+        }
+
+        .feedback-card {
+            background: white; border-radius: 25px;
+            padding: 2.5rem; max-width: 600px; width: 100%;
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+        .feedback-icon { font-size: 4rem; margin-bottom: 1rem; display: block; animation: bounce 0.5s ease; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .feedback-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 1rem; }
+
+        .feedback-score {
+            font-size: 1.1rem; color: var(--primary);
+            margin-bottom: 1rem; padding: 0.5rem 1.5rem;
+            background: #f3f4f6; border-radius: 30px; display: inline-block;
+        }
+
+        .feedback-message {
+            font-size: 0.95rem; line-height: 1.8;
+            color: var(--text-muted); margin-bottom: 2rem;
+            text-align: left; padding: 1rem;
+            background: #f9fafb; border-radius: 12px;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; border: none;
+            padding: 1rem 2rem; border-radius: 30px;
+            font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+            margin: 0.3rem;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .intro-screen {
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center; padding: 2rem;
+        }
+
+        .intro-card {
+            background: var(--card-bg); border-radius: 30px;
+            padding: 2.5rem; max-width: 800px;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .intro-logo { font-size: 4rem; margin-bottom: 0.5rem; animation: float-gentle 3s ease-in-out infinite; }
+
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .intro-title {
+            font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--restaurant-red), var(--restaurant-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 0.5rem;
+        }
+
+        .intro-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        .intro-desc {
+            font-size: 0.9rem; line-height: 1.7;
+            color: var(--text-dark); margin-bottom: 1.5rem;
+            text-align: left; padding: 1.2rem;
+            background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 15px;
+        }
+
+        .intro-rules { text-align: left; margin-bottom: 1.5rem; }
+        .intro-rules h3 { color: var(--primary); margin-bottom: 0.8rem; font-size: 1rem; }
+        .intro-rules ul { list-style: none; padding: 0; }
+        .intro-rules li { padding: 0.4rem 0; padding-left: 1.8rem; position: relative; font-size: 0.9rem; }
+        .intro-rules li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: bold; }
+
+        .reward-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 3px solid var(--gold);
+            border-radius: 15px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .reward-box h3 { color: var(--restaurant-gold); margin-bottom: 0.8rem; font-size: 1rem; }
+        .reward-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.4rem 0; font-size: 0.9rem; }
+        .reward-item .badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 0.2rem 0.6rem;
+            border-radius: 10px; font-size: 0.75rem; font-weight: bold;
+        }
+        .reward-item .badge.gold { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .reward-item .badge.silver { background: linear-gradient(135deg, #6b7280, #4b5563); }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--restaurant-red), var(--restaurant-gold));
+            color: white; border: none;
+            padding: 1rem 3rem; border-radius: 40px;
+            font-size: 1.2rem; font-weight: 700;
+            cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+        }
+
+        .start-btn:hover { transform: scale(1.08); }
+
+        .final-grade { font-size: 4rem; font-weight: 900; margin: 1rem 0; }
+        .grade-S { color: #fbbf24; }
+        .grade-A { color: #10b981; }
+        .grade-B { color: #3b82f6; }
+        .grade-C { color: #f59e0b; }
+        .grade-F { color: #ef4444; }
+
+        .final-comment {
+            font-size: 0.95rem; line-height: 1.7;
+            padding: 1.2rem; background: #f9fafb;
+            border-radius: 15px; margin: 1rem 0; text-align: left;
+        }
+
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem; margin: 1rem 0;
+        }
+
+        .score-item {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            padding: 0.8rem; border-radius: 12px; text-align: center;
+        }
+
+        .score-item .label { font-size: 0.7rem; color: var(--text-muted); }
+        .score-item .value { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+
+        #game-area { display: none; }
+
+        @media (max-width: 768px) {
+            .game-container { padding: 1rem; }
+            header { flex-direction: column; text-align: center; }
+            .stats { justify-content: center; }
+            .game-title h1 { font-size: 1.1rem; }
+            .intro-title { font-size: 1.5rem; }
+            .scenario-title { font-size: 1.2rem; }
+            .feedback-card { padding: 1.5rem; }
+            .score-breakdown { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="music-control">
+        <button class="music-btn" id="music-toggle" onclick="toggleMusic()" title="Play/Pause Music">🔇</button>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://archive.org/download/PachelbelCanonInDMajor/Pachelbel_%20Canon%20-%20In%20D%20Major.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="intro-screen" class="intro-screen">
+        <div class="intro-card">
+            <div class="intro-logo">🍽️</div>
+            <h1 class="intro-title">How-Dine Crisis: CVP Challenge</h1>
+            <p class="intro-subtitle">MBA | Cost & Management Accounting Practice</p>
+            
+            <div class="intro-desc">
+                <strong>📖 Story Background:</strong><br>
+                How-Dine Wedding Banquet Venue faced a devastating crisis when COVID-19 struck in 2020. Revenue plummeted 48% from NT$212M to NT$110M. As CFO, use CVP analysis to navigate this crisis and help Chairman Yeh make critical decisions!
+            </div>
+
+            <div class="intro-rules">
+                <h3>📋 Game Rules</h3>
+                <ul>
+                    <li>Complete <strong>5 CVP exercises</strong> to test your skills</li>
+                    <li>First correct attempt = <strong>100%</strong> points; Second = <strong>80%</strong>; Third = <strong>60%</strong>...</li>
+                    <li><strong>Calculate carefully</strong> — wrong options are common mistakes!</li>
+                </ul>
+            </div>
+
+            <div class="reward-box">
+                <h3>🎮 Bonus Game Rewards!</h3>
+                <div class="reward-item">
+                    <span class="badge gold">80+ pts</span>
+                    <span>Unlock <strong>2 plays</strong> of 1945 Air Force shooter! 🎯🎯</span>
+                </div>
+                <div class="reward-item">
+                    <span class="badge silver">60-79 pts</span>
+                    <span>Unlock <strong>1 play</strong> of 1945 Air Force shooter! 🎯</span>
+                </div>
+                <div class="reward-item">
+                    <span class="badge" style="background:#ef4444;">Below 60</span>
+                    <span>No bonus game — study harder! 📚</span>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="game.start()">🚀 Start Challenge</button>
+        </div>
+    </div>
+
+    <div id="game-area" class="game-container">
+        <header>
+            <div class="game-title">
+                <span class="logo">🍽️</span>
+                <div>
+                    <h1>How-Dine Crisis: CVP Challenge</h1>
+                    <p>People or Profit? Make strategic decisions!</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="label">Level</div>
+                    <div class="value" id="level-display">1 / 5</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">Score</div>
+                    <div class="value gold" id="score-display">0</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="progress-container">
+            <div class="progress-header">
+                <span>🎯 Progress</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="card" id="level-card">
+            <span class="level-badge" id="level-badge">📊 Exercise 1</span>
+            <h2 class="scenario-title" id="scenario-title">Break-Even Analysis</h2>
+            <div class="scenario-text" id="scenario-text"></div>
+            <div id="data-section"></div>
+            <div class="question-box">
+                <div class="attempt-info" id="attempt-info">🎯 Attempt: 1 / Points: 100%</div>
+                <p class="question-text" id="question-text"></p>
+                <div class="options-grid" id="options-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback-overlay" id="feedback-overlay">
+        <div class="feedback-card">
+            <span class="feedback-icon" id="feedback-icon">🎉</span>
+            <h2 class="feedback-title" id="feedback-title">Correct!</h2>
+            <div class="feedback-score" id="feedback-score">+20 points</div>
+            <p class="feedback-message" id="feedback-message"></p>
+            <button class="next-btn" id="feedback-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // Music Control
+        var bgMusic = document.getElementById('bgMusic');
+        var musicBtn = document.getElementById('music-toggle');
+        var musicPlaying = false;
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicBtn.textContent = '🔇';
+            } else {
+                bgMusic.volume = 0.4;
+                bgMusic.play();
+                musicBtn.textContent = '🔊';
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        // Game plays remaining
+        var bonusPlaysRemaining = 0;
+
+        // Level Data
+        var levels = [
+            {
+                id: 1,
+                title: "🏨 Exercise 1: Break-Even Point Analysis",
+                badge: "📊 Exercise 1: Break-Even Analysis",
+                points: 20,
+                scenario: "<strong>📅 March 2020 - The Crisis Begins</strong><br><br>You are How-Dine's CFO. The pandemic has devastated the wedding industry. Nearly all bookings were cancelled. Analyze the financial situation to advise Chairman Yeh.",
+                dataHtml: '<table class="data-table"><tr><th>Item</th><th>Amount (NT$)</th></tr><tr><td>Annual Revenue (2018)</td><td>$212,050,000</td></tr><tr><td>Variable Costs</td><td>~38% of revenue</td></tr><tr><td>Contribution Margin Ratio</td><td>62%</td></tr><tr><td>Annual Fixed Costs</td><td>$108,000,000</td></tr><tr><td>2020 Projected Revenue</td><td>$110,000,000 (48% decline)</td></tr></table>',
+                question: "What is the annual break-even revenue? What is the expected 2020 annual loss?",
+                options: [
+                    { text: "Break-even: ~NT$284M; Loss: ~NT$68M", isCorrect: false, feedback: "❌ You divided by Variable Cost Ratio (38%) instead of CM Ratio (62%)." },
+                    { text: "Break-even: ~NT$108M; Loss: ~NT$0", isCorrect: false, feedback: "❌ Fixed costs ≠ Break-even! Must divide by CM ratio." },
+                    { text: "Break-even: ~NT$174M; Loss: ~NT$40M", isCorrect: true, feedback: "✅ <strong>Correct!</strong><br><br>📐 Break-even = 108M ÷ 62% = <strong>NT$174M</strong><br>📐 Loss = 108M - (110M × 62%) = <strong>NT$40M</strong><br>📐 Monthly Loss ≈ <strong>NT$3.32M</strong>" },
+                    { text: "Break-even: ~NT$174M; Loss: ~NT$102M", isCorrect: false, feedback: "❌ Break-even correct, but Loss = Fixed Costs - CM, not Fixed Costs - Revenue." }
+                ]
+            },
+            {
+                id: 2,
+                title: "⚡ Exercise 2: Scenario A Analysis",
+                badge: "💼 Exercise 2A: Cash Burn",
+                points: 20,
+                scenario: "<strong>📅 Strategic Planning</strong><br><br>Analyze <strong>Scenario A: 50% Layoffs + 20% Salary Cut</strong>. After layoffs, salary = $2.25M; after 20% cut = $1.8M. Severance payment = $13.5M.",
+                dataHtml: '<table class="data-table"><tr><th>Item</th><th>Amount</th></tr><tr><td>Cash Reserves</td><td>NT$72,000,000</td></tr><tr><td>Monthly Fixed (Original)</td><td>NT$9,000,000</td></tr><tr><td>├ Salaries (45 staff)</td><td>NT$4,500,000</td></tr><tr><td>├ Rent</td><td>NT$1,250,000</td></tr><tr><td>├ Utilities</td><td>NT$800,000</td></tr><tr><td>└ Other</td><td>NT$2,450,000</td></tr><tr><td>Monthly CM (2020)</td><td>NT$5,683,333</td></tr></table>',
+                question: "Under Scenario A, what is the monthly loss and cash runway (after severance)?",
+                options: [
+                    { text: "Loss: ~NT$620K; Runway: ~117 months", isCorrect: false, feedback: "❌ Forgot to deduct severance payment of NT$13.5M!" },
+                    { text: "Loss: ~NT$620K; Runway: ~95 months", isCorrect: true, feedback: "✅ <strong>Correct!</strong><br><br>📐 New fixed = 1.8M + 1.25M + 0.8M + 2.45M = <strong>NT$6.3M</strong><br>📐 Loss = 6.3M - 5.68M = <strong>NT$620K</strong><br>📐 Cash after severance = 72M - 13.5M = NT$58.5M<br>📐 Runway = 58.5M ÷ 0.62M ≈ <strong>95 months</strong>" },
+                    { text: "Loss: ~NT$1.07M; Runway: ~55 months", isCorrect: false, feedback: "❌ Check your fixed cost calculation." },
+                    { text: "Loss: ~NT$2.7M; Runway: ~22 months", isCorrect: false, feedback: "❌ Salary reductions not applied correctly." }
+                ]
+            },
+            {
+                id: 3,
+                title: "🤝 Exercise 2: Scenarios C & D",
+                badge: "💼 Exercise 2B: Comparison",
+                points: 20,
+                scenario: "<strong>📅 People-First Options</strong><br><br><strong>C:</strong> No Layoffs + 20% Salary Cut (Salary = $3.6M)<br><strong>D:</strong> No Layoffs + Full Salary ($4.5M)<br><br>Monthly CM = $5.68M | Cash = $72M",
+                dataHtml: '<table class="data-table"><tr><th>Scenario</th><th>Fixed Costs</th></tr><tr><td>C: 20% Cut</td><td>3.6M + 1.25M + 0.8M + 2.45M = ?</td></tr><tr><td>D: Full Salary</td><td>4.5M + 1.25M + 0.8M + 2.45M = ?</td></tr></table>',
+                question: "Calculate monthly loss and runway for C and D. Which is correct?",
+                options: [
+                    { text: "C: ~NT$3.32M, ~22 mo; D: ~NT$2.42M, ~30 mo", isCorrect: false, feedback: "❌ Swapped! D costs more than C." },
+                    { text: "C: ~NT$1.52M, ~47 mo; D: ~NT$2.42M, ~30 mo", isCorrect: false, feedback: "❌ Check Scenario C's fixed cost." },
+                    { text: "C: ~NT$2.42M, ~30 mo; D: ~NT$4.22M, ~17 mo", isCorrect: false, feedback: "❌ Scenario D's loss is wrong." },
+                    { text: "C: ~NT$2.42M, ~30 mo; D: ~NT$3.32M, ~22 mo", isCorrect: true, feedback: "✅ <strong>Correct!</strong><br><br>📐 <strong>C:</strong> Fixed=8.1M, Loss=2.42M, Runway=30mo<br>📐 <strong>D:</strong> Fixed=9M, Loss=3.32M, Runway=22mo" }
+                ]
+            },
+            {
+                id: 4,
+                title: "🍱 Exercise 3: Bento Box CVP",
+                badge: "🥡 Exercise 3: New Product",
+                points: 20,
+                scenario: "<strong>📅 Innovation</strong><br><br>Launch NT$138 bento boxes to keep employees working.",
+                dataHtml: '<table class="data-table"><tr><th>Item</th><th>Amount</th></tr><tr><td>Price</td><td>NT$138/box</td></tr><tr><td>Ingredients</td><td>NT$95/box</td></tr><tr><td>Packaging</td><td>NT$8/box</td></tr><tr><td>Monthly Fixed</td><td>NT$50,000</td></tr></table>',
+                question: "CM per box? Break-even quantity? P/L if 1,000 sold?",
+                options: [
+                    { text: "CM: NT$43; BE: 1,163; 1,000→ -NT$7,000", isCorrect: false, feedback: "❌ Forgot packaging! VC = 95 + 8 = 103" },
+                    { text: "CM: NT$30; BE: 1,667; 1,000→ -NT$20,000", isCorrect: false, feedback: "❌ CM = 138 - 95 - 8 = 35, not 30" },
+                    { text: "CM: NT$35; BE: 1,429; 1,000→ -NT$15,000", isCorrect: true, feedback: "✅ <strong>Correct!</strong><br><br>📐 CM = 138 - 103 = <strong>NT$35</strong><br>📐 BE = 50,000 ÷ 35 = <strong>1,429 boxes</strong><br>📐 1,000 sold: (1,000×35) - 50,000 = <strong>-NT$15,000</strong><br><br>💡 Loses money but maintains morale & brand!" },
+                    { text: "CM: NT$35; BE: 2,857; 1,000→ -NT$65,000", isCorrect: false, feedback: "❌ CM correct, but BE = 50,000 ÷ 35 = 1,429" }
+                ]
+            },
+            {
+                id: 5,
+                title: "🎟️ Exercise 4: Meal Vouchers",
+                badge: "🎫 Exercise 4: Multi-Product",
+                points: 20,
+                scenario: "<strong>📅 Cash Flow</strong><br><br>\"10 Vouchers for NT$4,800\" — generates immediate cash! 500 sets sold in May 2020.",
+                dataHtml: '<table class="data-table"><tr><th>Item</th><th>Details</th></tr><tr><td>Package Price</td><td>NT$4,800 (10 vouchers)</td></tr><tr><td>Lobster meal cost</td><td>NT$600 (40% redemption)</td></tr><tr><td>Western set cost</td><td>NT$300 (60% redemption)</td></tr></table>',
+                question: "Redemption cost per set? CM per set? Total CM from 500 sets?",
+                options: [
+                    { text: "Cost: NT$4,500; CM: NT$300; Total: NT$150,000", isCorrect: false, feedback: "❌ Weighted avg = (40%×600)+(60%×300) = NT$420/voucher" },
+                    { text: "Cost: NT$4,200; CM: NT$600; Total: NT$300,000", isCorrect: true, feedback: "✅ <strong>Excellent!</strong><br><br>📐 Per voucher = (0.4×600)+(0.6×300) = <strong>NT$420</strong><br>📐 Per set = 420 × 10 = <strong>NT$4,200</strong><br>📐 CM = 4,800 - 4,200 = <strong>NT$600</strong><br>📐 Total = 600 × 500 = <strong>NT$300,000</strong><br><br>💰 Plus <strong>NT$2.4M instant cash!</strong>" },
+                    { text: "Cost: NT$3,600; CM: NT$1,200; Total: NT$600,000", isCorrect: false, feedback: "❌ Check weighted average: 10 × [(0.4×600)+(0.6×300)]" },
+                    { text: "Cost: NT$4,800; CM: NT$0; Total: NT$0", isCorrect: false, feedback: "❌ Cost is ingredients, not menu price!" }
+                ]
+            }
+        ];
+
+        // Game Logic
+        var game = {
+            currentLevelIndex: 0,
+            score: 0,
+            attempts: {},
+            
+            init: function() {
+                for (var i = 0; i < levels.length; i++) {
+                    this.attempts[i] = 0;
+                }
+                this.updateStats();
+                this.renderLevel();
+            },
+
+            start: function() {
+                document.getElementById('intro-screen').style.display = 'none';
+                document.getElementById('game-area').style.display = 'block';
+                this.init();
+            },
+
+            renderLevel: function() {
+                var level = levels[this.currentLevelIndex];
+                var attemptNum = this.attempts[this.currentLevelIndex] + 1;
+                var scorePercent = Math.max(20, 100 - (this.attempts[this.currentLevelIndex] * 20));
+                
+                document.getElementById('level-display').textContent = (this.currentLevelIndex + 1) + ' / ' + levels.length;
+                document.getElementById('level-badge').textContent = level.badge;
+                document.getElementById('scenario-title').textContent = level.title;
+                document.getElementById('scenario-text').innerHTML = level.scenario;
+                document.getElementById('data-section').innerHTML = level.dataHtml;
+                document.getElementById('question-text').textContent = level.question;
+                
+                document.getElementById('attempt-info').innerHTML = '🎯 Attempt: ' + attemptNum + ' / Points: <strong>' + scorePercent + '%</strong>';
+                
+                var progress = (this.currentLevelIndex / levels.length) * 100;
+                document.getElementById('progress-bar').style.width = progress + '%';
+                document.getElementById('progress-text').textContent = Math.round(progress) + '%';
+
+                var optionsGrid = document.getElementById('options-grid');
+                optionsGrid.innerHTML = '';
+                
+                var self = this;
+                level.options.forEach(function(opt, index) {
+                    var btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = '<span class="option-letter">' + String.fromCharCode(65+index) + '</span><span>' + opt.text + '</span>';
+                    btn.onclick = function() { self.checkAnswer(index); };
+                    optionsGrid.appendChild(btn);
+                });
+            },
+
+            checkAnswer: function(selectedIndex) {
+                var level = levels[this.currentLevelIndex];
+                var option = level.options[selectedIndex];
+                var btns = document.querySelectorAll('.option-btn');
+
+                for (var i = 0; i < btns.length; i++) { btns[i].disabled = true; }
+
+                btns[selectedIndex].classList.add(option.isCorrect ? 'correct' : 'wrong');
+                
+                if (!option.isCorrect) {
+                    for (var j = 0; j < level.options.length; j++) {
+                        if (level.options[j].isCorrect) btns[j].classList.add('correct');
+                    }
+                    this.attempts[this.currentLevelIndex]++;
+                }
+
+                this.showFeedback(option.isCorrect, option.feedback, level.points);
+            },
+
+            showFeedback: function(isCorrect, message, maxPoints) {
+                var overlay = document.getElementById('feedback-overlay');
+                var icon = document.getElementById('feedback-icon');
+                var title = document.getElementById('feedback-title');
+                var scoreDiv = document.getElementById('feedback-score');
+                var msg = document.getElementById('feedback-message');
+                var btn = document.getElementById('feedback-btn');
+                var self = this;
+
+                overlay.style.display = 'flex';
+                
+                if (isCorrect) {
+                    var scorePercent = Math.max(20, 100 - (this.attempts[this.currentLevelIndex] * 20));
+                    var earnedPoints = maxPoints * scorePercent / 100;
+                    
+                    icon.textContent = '🎉';
+                    title.textContent = 'Correct!';
+                    title.style.color = '#10b981';
+                    scoreDiv.textContent = '+' + earnedPoints + ' pts (' + scorePercent + '%)';
+                    scoreDiv.style.display = 'inline-block';
+                    
+                    this.score += earnedPoints;
+                    this.updateStats();
+                    
+                    if (this.currentLevelIndex === levels.length - 1) {
+                        btn.textContent = "🏆 View Results";
+                        btn.onclick = function() { self.finishGame(); };
+                    } else {
+                        btn.textContent = "➡️ Next";
+                        btn.onclick = function() {
+                            overlay.style.display = 'none';
+                            self.currentLevelIndex++;
+                            self.renderLevel();
+                        };
+                    }
+                } else {
+                    icon.textContent = '💡';
+                    title.textContent = 'Try Again!';
+                    title.style.color = '#f59e0b';
+                    scoreDiv.style.display = 'none';
+                    btn.textContent = "🔄 Retry";
+                    btn.onclick = function() {
+                        overlay.style.display = 'none';
+                        self.renderLevel();
+                    };
+                }
+                
+                msg.innerHTML = message;
+            },
+
+            updateStats: function() {
+                document.getElementById('score-display').textContent = Math.round(this.score);
+            },
+
+            finishGame: function() {
+                var finalScore = Math.round(this.score);
+                var grade, gradeClass, comment, plays;
+                
+                if (finalScore >= 90) {
+                    grade = 'S'; gradeClass = 'grade-S'; plays = 2;
+                    comment = '🌟 <strong>Strategic CFO Excellence!</strong> You mastered CVP analysis!<br>🎮 <strong>2 Bonus Game plays unlocked!</strong>';
+                } else if (finalScore >= 80) {
+                    grade = 'A'; gradeClass = 'grade-A'; plays = 2;
+                    comment = '👏 <strong>Strong Analyst!</strong> Solid CVP skills!<br>🎮 <strong>2 Bonus Game plays unlocked!</strong>';
+                } else if (finalScore >= 60) {
+                    grade = 'B'; gradeClass = 'grade-B'; plays = 1;
+                    comment = '📚 <strong>Good effort!</strong> Keep practicing!<br>🎮 <strong>1 Bonus Game play unlocked!</strong>';
+                } else {
+                    grade = 'C'; gradeClass = 'grade-C'; plays = 0;
+                    comment = '📖 <strong>Need more practice!</strong><br>🔒 Score 60+ to unlock Bonus Game!';
+                }
+                
+                bonusPlaysRemaining = plays;
+                
+                var gameBtn = plays > 0 
+                    ? '<button class="next-btn" style="background:linear-gradient(135deg,#10b981,#059669);" onclick="startBonusGame()">🎮 Play Game (' + plays + ' plays)</button>'
+                    : '<button class="next-btn" style="background:#9ca3af;cursor:not-allowed;" disabled>🔒 Locked</button>';
+                
+                var overlay = document.getElementById('feedback-overlay');
+                overlay.innerHTML = '<div class="feedback-card">' +
+                    '<span class="feedback-icon">🏆</span>' +
+                    '<h2 class="feedback-title" style="color:#fbbf24">Complete!</h2>' +
+                    '<div class="final-grade ' + gradeClass + '">' + grade + '</div>' +
+                    '<div class="score-breakdown">' +
+                    '<div class="score-item"><div class="label">Score</div><div class="value">' + finalScore + '</div></div>' +
+                    '<div class="score-item"><div class="label">Max</div><div class="value">100</div></div>' +
+                    '<div class="score-item"><div class="label">Plays</div><div class="value">' + plays + '</div></div>' +
+                    '</div>' +
+                    '<div class="final-comment">' + comment + '</div>' +
+                    '<div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">' +
+                    '<button class="next-btn" onclick="location.reload()">🔄 Retry CVP</button>' +
+                    gameBtn +
+                    '</div></div>';
+            }
+        };
+
+        // ==========================================
+        // 🎮 ENHANCED 1945 AIR FORCE SHOOTER
+        // ==========================================
+        function startBonusGame() {
+            if (bonusPlaysRemaining <= 0) return;
+            if (bgMusic) bgMusic.pause();
+            
+            document.body.innerHTML = '';
+            document.body.style.margin = '0';
+            document.body.style.overflow = 'hidden';
+            document.body.style.background = '#0a0a1a';
+            
+            var container = document.createElement('div');
+            container.id = 'shooter-container';
+            container.style.cssText = 'width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Poppins,sans-serif;position:relative;';
+            
+            container.innerHTML = '<style>' +
+                '#shooter-header{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;gap:20px;z-index:100;}' +
+                '.shooter-stat{background:rgba(0,0,0,0.7);padding:8px 16px;border-radius:20px;color:white;font-weight:bold;font-size:14px;}' +
+                '.shooter-stat span{color:#fbbf24;}' +
+                '#shooter-canvas{border:3px solid #fbbf24;border-radius:10px;box-shadow:0 0 50px rgba(251,191,36,0.3);}' +
+                '.shooter-btn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;padding:12px 30px;font-size:16px;font-weight:bold;border-radius:25px;cursor:pointer;margin:5px;}' +
+                '.shooter-btn:hover{transform:scale(1.05);}' +
+                '.shooter-btn.blue{background:linear-gradient(135deg,#6366f1,#8b5cf6);}' +
+                '.shooter-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:30px;border-radius:20px;text-align:center;color:white;z-index:200;border:3px solid #fbbf24;}' +
+                '.shooter-overlay h2{font-size:28px;margin-bottom:10px;}' +
+                '.shooter-overlay .score{font-size:48px;color:#fbbf24;margin:15px 0;}' +
+                '.plays-left{position:absolute;top:10px;right:20px;background:#10b981;color:white;padding:8px 15px;border-radius:20px;font-weight:bold;z-index:100;}' +
+                '.back-btn{position:absolute;top:10px;left:20px;background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 15px;border-radius:15px;cursor:pointer;z-index:100;}' +
+                '.combo-display{position:absolute;top:60px;left:50%;transform:translateX(-50%);font-size:24px;color:#fbbf24;font-weight:bold;text-shadow:0 0 10px #fbbf24;opacity:0;transition:opacity 0.3s;z-index:100;}' +
+                '.powerup-display{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:100;}' +
+                '.powerup-item{background:rgba(0,0,0,0.7);padding:5px 10px;border-radius:10px;color:white;font-size:12px;}' +
+                '</style>' +
+                '<button class="back-btn" onclick="location.reload()">← Back to CVP</button>' +
+                '<div class="plays-left">🎮 Plays: <span id="playsLeft">' + bonusPlaysRemaining + '</span></div>' +
+                '<div id="shooter-header">' +
+                '<div class="shooter-stat">SCORE: <span id="sScore">0</span></div>' +
+                '<div class="shooter-stat">LIVES: <span id="sLives">❤️❤️❤️</span></div>' +
+                '<div class="shooter-stat">WAVE: <span id="sWave">1</span></div>' +
+                '</div>' +
+                '<div class="combo-display" id="comboDisplay">COMBO x5!</div>' +
+                '<canvas id="shooter-canvas"></canvas>' +
+                '<div class="powerup-display" id="powerupDisplay"></div>';
+            
+            document.body.appendChild(container);
+            
+            initEnhancedShooter();
+        }
+
+        function initEnhancedShooter() {
+            // 清除舊的 Game Over overlay
+            var oldOverlays = document.querySelectorAll('.shooter-overlay');
+            oldOverlays.forEach(function(el) { el.remove(); });
+            
+            var canvas = document.getElementById('shooter-canvas');
+            var ctx = canvas.getContext('2d');
+            
+            // Responsive canvas size
+            var maxW = Math.min(450, window.innerWidth - 40);
+            var maxH = Math.min(650, window.innerHeight - 100);
+            canvas.width = maxW;
+            canvas.height = maxH;
+            
+            var gs = {
+                score: 0,
+                lives: 3,
+                wave: 1,
+                gameOver: false,
+                combo: 0,
+                maxCombo: 0,
+                player: { x: maxW/2 - 25, y: maxH - 70, w: 50, h: 60, speed: 7 },
+                bullets: [],
+                enemies: [],
+                enemyBullets: [],
+                explosions: [],
+                particles: [],
+                powerups: [],
+                stars: [],
+                lastShot: 0,
+                shootInt: 120,
+                spawnTimer: 0,
+                keys: { left: false, right: false },
+                // Power-up states
+                rapidFire: false,
+                rapidFireTime: 0,
+                shield: false,
+                shieldTime: 0,
+                tripleShot: false,
+                tripleShotTime: 0
+            };
+            
+            // Create stars
+            for (var i = 0; i < 100; i++) {
+                gs.stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speed: Math.random() * 2 + 1
+                });
+            }
+            
+            // Touch controls
+            canvas.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                var rect = canvas.getBoundingClientRect();
+                gs.player.x = ((e.touches[0].clientX - rect.left) / rect.width) * canvas.width - gs.player.w/2;
+            });
+            
+            canvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+            });
+            
+            // Keyboard
+            document.onkeydown = function(e) {
+                if (e.key === 'ArrowLeft' || e.key === 'a') gs.keys.left = true;
+                if (e.key === 'ArrowRight' || e.key === 'd') gs.keys.right = true;
+            };
+            document.onkeyup = function(e) {
+                if (e.key === 'ArrowLeft' || e.key === 'a') gs.keys.left = false;
+                if (e.key === 'ArrowRight' || e.key === 'd') gs.keys.right = false;
+            };
+            
+            function drawStars() {
+                gs.stars.forEach(function(star) {
+                    ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + Math.random() * 0.4) + ')';
+                    ctx.fillRect(star.x, star.y, star.size, star.size);
+                    star.y += star.speed;
+                    if (star.y > canvas.height) {
+                        star.y = 0;
+                        star.x = Math.random() * canvas.width;
+                    }
+                });
+            }
+            
+            function drawPlayer() {
+                var p = gs.player;
+                ctx.save();
+                
+                // Shield effect
+                if (gs.shield) {
+                    ctx.beginPath();
+                    ctx.arc(p.x + p.w/2, p.y + p.h/2, 40, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+                    ctx.fill();
+                }
+                
+                // Body
+                var gradient = ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y + p.h);
+                gradient.addColorStop(0, '#3b82f6');
+                gradient.addColorStop(1, '#1d4ed8');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(p.x + p.w/2, p.y);
+                ctx.lineTo(p.x + p.w, p.y + p.h);
+                ctx.lineTo(p.x + p.w * 0.7, p.y + p.h * 0.7);
+                ctx.lineTo(p.x + p.w * 0.3, p.y + p.h * 0.7);
+                ctx.lineTo(p.x, p.y + p.h);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Wings
+                ctx.fillStyle = '#60a5fa';
+                ctx.fillRect(p.x - 12, p.y + 30, p.w + 24, 8);
+                
+                // Cockpit
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.ellipse(p.x + p.w/2, p.y + 22, 8, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Engine flames
+                var flameHeight = 12 + Math.random() * 8;
+                var flameGrad = ctx.createLinearGradient(0, p.y + p.h, 0, p.y + p.h + flameHeight);
+                flameGrad.addColorStop(0, '#fbbf24');
+                flameGrad.addColorStop(0.5, '#f97316');
+                flameGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = flameGrad;
+                ctx.fillRect(p.x + 10, p.y + p.h - 5, 8, flameHeight);
+                ctx.fillRect(p.x + p.w - 18, p.y + p.h - 5, 8, flameHeight);
+                
+                ctx.restore();
+            }
+            
+            function drawEnemy(e) {
+                ctx.save();
+                var gradient;
+                
+                if (e.type === 'boss') {
+                    gradient = ctx.createLinearGradient(e.x, e.y, e.x + e.w, e.y + e.h);
+                    gradient.addColorStop(0, '#7c3aed');
+                    gradient.addColorStop(1, '#5b21b6');
+                    ctx.fillStyle = gradient;
+                    // Boss body
+                    ctx.beginPath();
+                    ctx.moveTo(e.x + e.w/2, e.y + e.h);
+                    ctx.lineTo(e.x + e.w, e.y + 10);
+                    ctx.lineTo(e.x + e.w - 10, e.y);
+                    ctx.lineTo(e.x + 10, e.y);
+                    ctx.lineTo(e.x, e.y + 10);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Boss wings
+                    ctx.fillStyle = '#8b5cf6';
+                    ctx.fillRect(e.x - 15, e.y + 15, e.w + 30, 12);
+                    // Health bar
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(e.x, e.y - 10, e.w, 5);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(e.x, e.y - 10, e.w * (e.hp / e.maxHp), 5);
+                } else if (e.type === 'fast') {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.beginPath();
+                    ctx.moveTo(e.x + e.w/2, e.y + e.h);
+                    ctx.lineTo(e.x + e.w, e.y);
+                    ctx.lineTo(e.x, e.y);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    gradient = ctx.createLinearGradient(e.x, e.y, e.x + e.w, e.y + e.h);
+                    gradient.addColorStop(0, '#ef4444');
+                    gradient.addColorStop(1, '#b91c1c');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.moveTo(e.x + e.w/2, e.y + e.h);
+                    ctx.lineTo(e.x + e.w, e.y);
+                    ctx.lineTo(e.x, e.y);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = '#f87171';
+                    ctx.fillRect(e.x - 5, e.y + 10, e.w + 10, 6);
+                }
+                ctx.restore();
+            }
+            
+            function drawBullet(b, enemy) {
+                ctx.save();
+                if (enemy) {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.shadowColor = '#ef4444';
+                } else {
+                    ctx.fillStyle = b.powered ? '#10b981' : '#fbbf24';
+                    ctx.shadowColor = b.powered ? '#10b981' : '#fbbf24';
+                }
+                ctx.shadowBlur = 10;
+                ctx.fillRect(b.x, b.y, b.w, b.h);
+                ctx.restore();
+            }
+            
+            function drawExplosion(exp) {
+                ctx.save();
+                ctx.globalAlpha = exp.life / exp.maxLife;
+                var gradient = ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.r);
+                gradient.addColorStop(0, '#ffffff');
+                gradient.addColorStop(0.3, '#fbbf24');
+                gradient.addColorStop(0.6, '#f97316');
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(exp.x, exp.y, exp.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            function drawParticle(p) {
+                ctx.save();
+                ctx.globalAlpha = p.life / p.maxLife;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.restore();
+            }
+            
+            function drawPowerup(pu) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(pu.x, pu.y, 15, 0, Math.PI * 2);
+                ctx.fillStyle = pu.type === 'rapid' ? '#ef4444' : pu.type === 'shield' ? '#3b82f6' : '#10b981';
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(pu.type === 'rapid' ? 'R' : pu.type === 'shield' ? 'S' : 'T', pu.x, pu.y);
+                ctx.restore();
+            }
+            
+            function spawnEnemy() {
+                var rand = Math.random();
+                var type = 'normal';
+                var w = 40, h = 45, hp = 1, speed = 1.5 + gs.wave * 0.2;
+                
+                if (gs.wave >= 3 && rand < 0.15) {
+                    type = 'boss';
+                    w = 80; h = 60; hp = 8 + gs.wave; speed = 1;
+                } else if (rand < 0.3) {
+                    type = 'fast';
+                    w = 30; h = 35; hp = 1; speed = 3 + gs.wave * 0.3;
+                }
+                
+                gs.enemies.push({
+                    x: Math.random() * (canvas.width - w),
+                    y: -h,
+                    w: w, h: h,
+                    speed: speed,
+                    hp: hp, maxHp: hp,
+                    type: type,
+                    shootTimer: 0,
+                    moveDir: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+            
+            function spawnPowerup(x, y) {
+                if (Math.random() < 0.15) {
+                    var types = ['rapid', 'shield', 'triple'];
+                    gs.powerups.push({
+                        x: x, y: y,
+                        type: types[Math.floor(Math.random() * types.length)],
+                        speed: 2
+                    });
+                }
+            }
+            
+            function createExplosion(x, y, size) {
+                gs.explosions.push({ x: x, y: y, r: size, life: 30, maxLife: 30 });
+                for (var i = 0; i < 15; i++) {
+                    gs.particles.push({
+                        x: x, y: y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8,
+                        size: Math.random() * 4 + 2,
+                        color: ['#fbbf24', '#f97316', '#ef4444', '#ffffff'][Math.floor(Math.random() * 4)],
+                        life: 30, maxLife: 30
+                    });
+                }
+            }
+            
+            function hit(a, b) {
+                return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+            }
+            
+            function updateCombo(add) {
+                if (add) {
+                    gs.combo++;
+                    if (gs.combo > gs.maxCombo) gs.maxCombo = gs.combo;
+                    if (gs.combo >= 5) {
+                        var comboEl = document.getElementById('comboDisplay');
+                        comboEl.textContent = 'COMBO x' + gs.combo + '!';
+                        comboEl.style.opacity = '1';
+                        setTimeout(function() { comboEl.style.opacity = '0'; }, 1000);
+                    }
+                } else {
+                    gs.combo = 0;
+                }
+            }
+            
+            function updateUI() {
+                document.getElementById('sScore').textContent = gs.score;
+                document.getElementById('sLives').textContent = '❤️'.repeat(Math.max(0, gs.lives));
+                document.getElementById('sWave').textContent = gs.wave;
+                
+                var powerupHtml = '';
+                if (gs.rapidFire) powerupHtml += '<div class="powerup-item">🔴 Rapid</div>';
+                if (gs.shield) powerupHtml += '<div class="powerup-item">🔵 Shield</div>';
+                if (gs.tripleShot) powerupHtml += '<div class="powerup-item">🟢 Triple</div>';
+                document.getElementById('powerupDisplay').innerHTML = powerupHtml;
+            }
+            
+            function gameOver() {
+                gs.gameOver = true;
+                bonusPlaysRemaining--;
+                
+                var canPlayAgain = bonusPlaysRemaining > 0;
+                var playBtn = canPlayAgain 
+                    ? '<button class="shooter-btn" onclick="initEnhancedShooter()">🔄 Play Again (' + bonusPlaysRemaining + ' left)</button>'
+                    : '<button class="shooter-btn" style="background:#9ca3af;cursor:not-allowed;" disabled>No plays left</button>';
+                
+                var overlay = document.createElement('div');
+                overlay.className = 'shooter-overlay';
+                overlay.innerHTML = '<h2>💥 GAME OVER 💥</h2>' +
+                    '<div class="score">' + gs.score + '</div>' +
+                    '<p style="color:#a0aec0;">Wave: ' + gs.wave + ' | Max Combo: ' + gs.maxCombo + '</p>' +
+                    '<div style="margin-top:20px;">' +
+                    playBtn +
+                    '<button class="shooter-btn blue" onclick="location.reload()">📊 Back to CVP</button>' +
+                    '</div>';
+                
+                document.getElementById('shooter-container').appendChild(overlay);
+                document.getElementById('playsLeft').textContent = bonusPlaysRemaining;
+            }
+            
+            function loop() {
+                if (gs.gameOver) return;
+                
+                // Clear
+                ctx.fillStyle = '#0a0a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Stars
+                drawStars();
+                
+                // Move player
+                if (gs.keys.left) gs.player.x -= gs.player.speed;
+                if (gs.keys.right) gs.player.x += gs.player.speed;
+                gs.player.x = Math.max(0, Math.min(canvas.width - gs.player.w, gs.player.x));
+                
+                // Update powerup timers
+                var now = Date.now();
+                if (gs.rapidFire && now > gs.rapidFireTime) gs.rapidFire = false;
+                if (gs.shield && now > gs.shieldTime) gs.shield = false;
+                if (gs.tripleShot && now > gs.tripleShotTime) gs.tripleShot = false;
+                
+                // Auto shoot
+                var shootInterval = gs.rapidFire ? 60 : gs.shootInt;
+                if (now - gs.lastShot > shootInterval) {
+                    if (gs.tripleShot) {
+                        gs.bullets.push({ x: gs.player.x + gs.player.w/2 - 3, y: gs.player.y, w: 6, h: 18, speed: 12, powered: true });
+                        gs.bullets.push({ x: gs.player.x + 5, y: gs.player.y + 10, w: 5, h: 15, speed: 11, powered: true });
+                        gs.bullets.push({ x: gs.player.x + gs.player.w - 10, y: gs.player.y + 10, w: 5, h: 15, speed: 11, powered: true });
+                    } else {
+                        gs.bullets.push({ x: gs.player.x + gs.player.w/2 - 3, y: gs.player.y, w: 6, h: 18, speed: 12, powered: gs.rapidFire });
+                    }
+                    gs.lastShot = now;
+                }
+                
+                // Spawn enemies
+                gs.spawnTimer++;
+                var spawnRate = Math.max(25, 50 - gs.wave * 3);
+                if (gs.spawnTimer > spawnRate) {
+                    spawnEnemy();
+                    gs.spawnTimer = 0;
+                }
+                
+                // Update bullets
+                gs.bullets = gs.bullets.filter(function(b) { b.y -= b.speed; return b.y > -20; });
+                gs.enemyBullets = gs.enemyBullets.filter(function(b) { b.y += b.speed; return b.y < canvas.height + 20; });
+                
+                // Update powerups
+                gs.powerups = gs.powerups.filter(function(pu) {
+                    pu.y += pu.speed;
+                    if (hit({ x: pu.x - 15, y: pu.y - 15, w: 30, h: 30 }, gs.player)) {
+                        if (pu.type === 'rapid') { gs.rapidFire = true; gs.rapidFireTime = Date.now() + 5000; }
+                        if (pu.type === 'shield') { gs.shield = true; gs.shieldTime = Date.now() + 5000; }
+                        if (pu.type === 'triple') { gs.tripleShot = true; gs.tripleShotTime = Date.now() + 5000; }
+                        return false;
+                    }
+                    return pu.y < canvas.height + 20;
+                });
+                
+                // Update enemies
+                gs.enemies = gs.enemies.filter(function(e) {
+                    e.y += e.speed;
+                    
+                    // Boss movement
+                    if (e.type === 'boss') {
+                        e.x += e.moveDir * 1.5;
+                        if (e.x <= 0 || e.x >= canvas.width - e.w) e.moveDir *= -1;
+                    }
+                    
+                    // Enemy shooting
+                    e.shootTimer++;
+                    if (e.shootTimer > 80 && Math.random() < 0.03) {
+                        gs.enemyBullets.push({ x: e.x + e.w/2 - 3, y: e.y + e.h, w: 6, h: 12, speed: 5 });
+                        if (e.type === 'boss') {
+                            gs.enemyBullets.push({ x: e.x + 10, y: e.y + e.h, w: 6, h: 12, speed: 4 });
+                            gs.enemyBullets.push({ x: e.x + e.w - 16, y: e.y + e.h, w: 6, h: 12, speed: 4 });
+                        }
+                        e.shootTimer = 0;
+                    }
+                    
+                    if (e.y > canvas.height) {
+                        updateCombo(false);
+                        return false;
+                    }
+                    
+                    // Check bullet hits
+                    for (var i = gs.bullets.length - 1; i >= 0; i--) {
+                        if (hit(gs.bullets[i], e)) {
+                            gs.bullets.splice(i, 1);
+                            e.hp--;
+                            if (e.hp <= 0) {
+                                var points = e.type === 'boss' ? 500 : e.type === 'fast' ? 150 : 100;
+                                points += gs.combo * 10;
+                                gs.score += points;
+                                createExplosion(e.x + e.w/2, e.y + e.h/2, e.type === 'boss' ? 60 : 35);
+                                spawnPowerup(e.x + e.w/2, e.y + e.h/2);
+                                updateCombo(true);
+                                if (gs.score >= gs.wave * 1500) gs.wave++;
+                                return false;
+                            }
+                        }
+                    }
+                    
+                    // Check collision with player
+                    if (hit(e, gs.player)) {
+                        if (!gs.shield) {
+                            gs.lives--;
+                            updateCombo(false);
+                            createExplosion(e.x + e.w/2, e.y + e.h/2, 40);
+                            if (gs.lives <= 0) gameOver();
+                        }
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                // Enemy bullets hit player
+                if (!gs.shield) {
+                    gs.enemyBullets = gs.enemyBullets.filter(function(b) {
+                        if (hit(b, gs.player)) {
+                            gs.lives--;
+                            updateCombo(false);
+                            if (gs.lives <= 0) gameOver();
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+                
+                // Update explosions
+                gs.explosions = gs.explosions.filter(function(exp) { exp.life--; exp.r += 3; return exp.life > 0; });
+                
+                // Update particles
+                gs.particles = gs.particles.filter(function(p) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2;
+                    p.life--;
+                    return p.life > 0;
+                });
+                
+                // Draw everything
+                gs.particles.forEach(function(p) { drawParticle(p); });
+                gs.powerups.forEach(function(pu) { drawPowerup(pu); });
+                gs.bullets.forEach(function(b) { drawBullet(b, false); });
+                gs.enemyBullets.forEach(function(b) { drawBullet(b, true); });
+                gs.enemies.forEach(function(e) { drawEnemy(e); });
+                gs.explosions.forEach(function(e) { drawExplosion(e); });
+                drawPlayer();
+                
+                updateUI();
+                requestAnimationFrame(loop);
+            }
+            
+            loop();
+        }
+    </script>
+</body>
+</html>
