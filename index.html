@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFO 的決策挑戰：管理會計實戰 (MBA Edition)</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --primary: #0f3460;
+            --accent: #e94560;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --gold: #ffd700;
+            --success: #4caf50;
+            --error: #f44336;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Header & Stats */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border-left: 5px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .game-title h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .game-title p {
+            margin: 0.3rem 0 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            text-align: right;
+        }
+
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ff9a9e);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Scenario Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--text-main);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h2.scenario-title {
+            margin-top: 0;
+            color: var(--gold);
+            font-size: 1.8rem;
+        }
+
+        .scenario-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid rgba(255,255,255,0.2);
+            padding-left: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background: rgba(0,0,0,0.2);
+            color: var(--accent);
+        }
+
+        .data-table tr:nth-child(even) {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .question-box {
+            background: rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .option-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .option-btn.selected {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .option-btn.wrong {
+            border-color: var(--error);
+            background: rgba(244, 67, 54, 0.2);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Feedback Modal */
+        .feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .feedback-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .feedback-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feedback-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .feedback-message {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .next-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            background: #ff5e78;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                gap: 1rem;
+            }
+            .stat-item .value {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Intro Screen */
+        #intro-screen {
+            text-align: center;
+        }
+
+        .start-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 2rem;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="game-title">
+                <h1>CFO 的決策挑戰</h1>
+                <p>Advanced Managerial Accounting Simulation</p>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="label">Level</div>
+                    <div class="value" id="level-display">1 / 4</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">Score</div>
+                    <div class="value" id="score-display">0</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="card">
+            <h2 style="font-size: 2.5rem; color: var(--gold); margin-bottom: 1rem;">歡迎來到董事會</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                您已被任命為集團新任 CFO。未來的幾個季度，您將面臨一系列棘手的管理決策。<br>
+                從成本結構分析到跨部門轉撥計價，每一個數字背後都代表著策略方向。<br><br>
+                <strong>挑戰規則：</strong><br>
+                1. 每個關卡代表一個真實商業情境。<br>
+                2. 您必須根據提供的數據進行計算。<br>
+                3. 做出正確的決策（選擇題）才能晉級。<br>
+                4. 錯誤的決策將導致股價下跌（扣分）。
+            </p>
+            <button class="start-btn" onclick="game.start()">接受任命 (Start)</button>
+        </div>
+
+        <!-- Game Area (Hidden initially) -->
+        <div id="game-area" class="card" style="display: none;">
+            <div class="level-badge" id="level-badge">LEVEL 1 - 成本行為分析</div>
+            <h2 class="scenario-title" id="scenario-title">情境標題</h2>
+            <div class="scenario-text" id="scenario-text">
+                情境描述...
+            </div>
+            <div id="data-container">
+                <!-- Data table injected here -->
+            </div>
+            
+            <div class="question-box">
+                <div class="question-text" id="question-text">題目...</div>
+                <div class="options-grid" id="options-grid">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedback-overlay">
+        <div class="feedback-card">
+            <span class="feedback-icon" id="feedback-icon">✅</span>
+            <h2 class="feedback-title" id="feedback-title">決策正確</h2>
+            <div class="feedback-message" id="feedback-message">
+                解釋為何正確...
+            </div>
+            <button class="next-btn" id="feedback-btn" onclick="game.nextLevel()">下一關</button>
+        </div>
+    </div>
+
+    <script>
+        const levels = [
+            {
+                id: 1,
+                title: "回歸分析與成本估計",
+                badge: "Level 1: Cost Estimation",
+                scenario: `
+                    <p><strong>情境：</strong> 集團正考慮擴建新的物流中心。作為 CFO，您要求分析部門提供過去 12 個月的「維修費用」與「機器運轉小時」數據。分析團隊跑了一份簡單迴歸分析 (Simple Regression Analysis)，報告顯示如下：</p>
+                    <table class="data-table">
+                        <tr><th>項目</th><th>係數 (Coefficients)</th><th>t-Stat</th></tr>
+                        <tr><td>截距項 (Intercept)</td><td>15,000</td><td>1.85</td></tr>
+                        <tr><td>X 變數 (機器小時)</td><td>25</td><td>12.4</td></tr>
+                    </table>
+                    <p><strong>補充資訊：</strong> R-square 為 0.85；查表得知 t-critical value (雙尾, 95%) 約為 2.23。</p>
+                    <p>營運長拿著這份報告問您：「如果下個月預計機器運轉 2,000 小時，我們應該編列多少維修預算？」</p>
+                `,
+                question: "根據統計顯著性與成本動因分析，下列哪個預算估計數字在管理決策上最為合理？",
+                options: [
+                    { text: "$65,000 (直接代入回歸方程式：15,000 + 25×2,000)", isCorrect: false, feedback: "您忽略了統計顯著性。截距項的 t-stat (1.85) 小於臨界值 (2.23)，表示固定成本項在統計上不顯著異於零。" },
+                    { text: "$50,000 (僅考慮變動部分：25 × 2,000)", isCorrect: true, feedback: "正確！由於截距項 (固定成本) 的 t-stat < 2.23，統計上不顯著，應視為 0。因此成本函數應簡化為 Y = 25X。預算 = 25 * 2,000 = 50,000。" },
+                    { text: "$53,125 (考慮 R-square 調整：65,000 × 0.85)", isCorrect: false, feedback: "R-square 代表解釋力，不能直接用來打折預算金額。" },
+                    { text: "$42,500 (僅考慮變動部分並調整 R-square)", isCorrect: false, feedback: "邏輯錯誤。R-square 不影響預測值的點估計計算。" }
+                ]
+            },
+            {
+                id: 2,
+                title: "營運槓桿與風險決策",
+                badge: "Level 2: CVP & Risk",
+                scenario: `
+                    <p><strong>情境：</strong> 兩個事業部 (A 與 B) 去年的營收皆為 $1,000,000，營業利益皆為 $100,000。但兩者的成本結構截然不同：</p>
+                    <table class="data-table">
+                        <tr><th>項目</th><th>事業部 A (自動化程度高)</th><th>事業部 B (人工密集)</th></tr>
+                        <tr><td>變動成本率</td><td>20%</td><td>60%</td></tr>
+                        <tr><td>固定成本</td><td>$700,000</td><td>$300,000</td></tr>
+                    </table>
+                    <p><strong>挑戰：</strong> 經濟學家預測明年景氣將面臨衰退，預估營收恐將<strong>下滑 20%</strong>。董事會問您：「在這種情況下，哪個事業部的獲利受傷程度會較輕微？」</p>
+                `,
+                question: "請計算兩者的營運槓桿度 (DOL)，並判斷誰的獲利衰退幅度較小？",
+                options: [
+                    { text: "事業部 A 受傷較輕，因為它的邊際貢獻率 (CM Ratio) 較高 (80%)。", isCorrect: false, feedback: "錯誤。CM Ratio 高意味著營收每下降 $1，損失的貢獻毛利更多。且 A 的固定成本高，DOL 較高，風險較大。" },
+                    { text: "事業部 B 受傷較輕，因為它的 DOL 為 4，低於事業部 A 的 8。", isCorrect: true, feedback: "正確！<br>A 的 CM = 1,000,000 × 80% = 800,000; DOL = 800,000 / 100,000 = 8。<br>B 的 CM = 1,000,000 × 40% = 400,000; DOL = 400,000 / 100,000 = 4。<br>營收下滑 20% 時，B 的獲利僅下滑 4 × 20% = 80%，而 A 將下滑 8 × 20% = 160% (轉盈為虧)。" },
+                    { text: "兩者受傷程度相同，因為去年的營業利益都是 $100,000。", isCorrect: false, feedback: "錯誤。營業利益相同不代表風險結構相同，必須看成本結構 (固定 vs 變動)。" },
+                    { text: "事業部 A 受傷較輕，因為它的損益兩平點較低。", isCorrect: false, feedback: "錯誤。A 的損益兩平點 = 700,000 / 0.8 = 875,000；B 的損益兩平點 = 300,000 / 0.4 = 750,000。A 的損益兩平點其實較高，風險較大。" }
+                ]
+            },
+            {
+                id: 3,
+                title: "產能受限下的特別訂單",
+                badge: "Level 3: Relevant Costing",
+                scenario: `
+                    <p><strong>情境：</strong> 公司產能已滿載 (10,000 單位)，目前全數銷售給常規客戶，單價 $200，單位變動成本 $120。固定成本分攤每單位 $30。</p>
+                    <p>現在有一位新客戶提出「一次性特別訂單」，想購買 1,000 單位，出價 $150。接受此訂單無需額外行銷費用，但由於產能滿載，必須犧牲 1,000 單位的常規銷量來滿足此訂單。</p>
+                `,
+                question: "作為 CFO，您應建議接受還是拒絕？對公司利潤的影響為何？",
+                options: [
+                    { text: "接受，因為出價 $150 高於單位變動成本 $120，每單位多賺 $30。", isCorrect: false, feedback: "錯誤。您忽略了機會成本。因為產能滿載，接單必須排擠利潤更高的常規訂單。" },
+                    { text: "拒絕，因為出價 $150 低於完全成本 $150 ($120 + $30)，無利可圖。", isCorrect: false, feedback: "錯誤。沈沒成本 (固定成本分攤) 不應納入決策，但此題關鍵在於機會成本。" },
+                    { text: "拒絕，接受此訂單將使公司總利潤減少 $50,000。", isCorrect: true, feedback: "正確！<br>機會成本 (犧牲常規訂單的 CM) = ($200 - $120) = $80。<br>新訂單帶來的 CM = ($150 - $120) = $30。<br>每接受一單位，反而損失 $50 ($30 - $80)。總損失 = 1,000 × $50 = $50,000。" },
+                    { text: "接受，但前提是新客戶願意提高出價至 $180。", isCorrect: false, feedback: "即使出價 $180，仍低於常規訂單帶來的 $200 價值 (假設變動成本相同)，仍然不划算。" }
+                ]
+            },
+            {
+                id: 4,
+                title: "部門績效評估：ROI vs RI",
+                badge: "Level 4: Performance Evaluation",
+                scenario: `
+                    <p><strong>情境：</strong> 投資中心經理 Mary 正考慮一個新投資案：投資額 $1,000,000，預計每年產生營業利益 $160,000 (ROI = 16%)。</p>
+                    <p>目前 Mary 所管轄部門的現有 ROI 為 20%。公司的資金成本 (Required Rate of Return) 為 12%。</p>
+                    <p>Mary 似乎不太想執行這個計畫，但總公司認為這對集團有利。</p>
+                `,
+                question: "為何會出現目標不一致 (Goal Congruence) 問題？如果改用剩餘利益 (Residual Income, RI) 評估，Mary 的決策會改變嗎？",
+                options: [
+                    { text: "Mary 拒絕是因為新案 ROI (16%) 低於她目前的 ROI (20%)，會拉低績效。若改用 RI，新案 RI 為正 ($40,000)，她就會接受。", isCorrect: true, feedback: "完全正確！<br>ROI 制度下，經理傾向拒絕「高於資金成本但低於目前績效」的案件。<br>RI = 獲利 - (投資額 × 資金成本) = 160,000 - (1,000,000 × 12%) = +40,000。RI 增加，經理就會願意投資，達成目標一致性。" },
+                    { text: "Mary 拒絕是因為新案 ROI 低於資金成本。改用 RI 也不會改變結果。", isCorrect: false, feedback: "錯誤。新案 ROI 16% 高於資金成本 12%，對公司是有利的。" },
+                    { text: "Mary 拒絕是因為風險考量。改用 RI 會讓數字變負，她更不會接受。", isCorrect: false, feedback: "錯誤。RI 計算為 160,000 - 120,000 = 40,000，是正數。" },
+                    { text: "這純粹是溝通問題，與績效指標 (ROI 或 RI) 無關。", isCorrect: false, feedback: "錯誤。這是經典的 ROI 績效評估缺陷案例。" }
+                ]
+            }
+        ];
+
+        const game = {
+            currentLevelIndex: 0,
+            score: 0,
+            
+            init: function() {
+                this.updateStats();
+                this.renderLevel();
+            },
+
+            start: function() {
+                document.getElementById('intro-screen').style.display = 'none';
+                document.getElementById('game-area').style.display = 'block';
+                this.init();
+            },
+
+            renderLevel: function() {
+                const level = levels[this.currentLevelIndex];
+                
+                // Update UI
+                document.getElementById('level-display').textContent = `${this.currentLevelIndex + 1} / ${levels.length}`;
+                document.getElementById('level-badge').textContent = level.badge;
+                document.getElementById('scenario-title').textContent = level.title;
+                document.getElementById('scenario-text').innerHTML = level.scenario;
+                document.getElementById('question-text').textContent = level.question;
+                
+                // Update Progress Bar
+                const progress = ((this.currentLevelIndex) / levels.length) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+
+                // Render Options
+                const optionsGrid = document.getElementById('options-grid');
+                optionsGrid.innerHTML = '';
+                
+                level.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = `<strong style="color:var(--accent)">${String.fromCharCode(65+index)}.</strong> ${opt.text}`;
+                    btn.onclick = () => this.checkAnswer(index);
+                    optionsGrid.appendChild(btn);
+                });
+            },
+
+            checkAnswer: function(selectedIndex) {
+                const level = levels[this.currentLevelIndex];
+                const option = level.options[selectedIndex];
+                const btns = document.querySelectorAll('.option-btn');
+
+                // Disable all buttons
+                btns.forEach(btn => btn.disabled = true);
+
+                // Highlight buttons
+                btns[selectedIndex].classList.add(option.isCorrect ? 'correct' : 'wrong');
+                if (!option.isCorrect) {
+                    // Find correct one
+                    level.options.forEach((opt, idx) => {
+                        if (opt.isCorrect) btns[idx].classList.add('correct');
+                    });
+                }
+
+                // Show Feedback
+                this.showFeedback(option.isCorrect, option.feedback);
+
+                // Update Score
+                if (option.isCorrect) {
+                    this.score += 100;
+                    this.updateStats();
+                } else {
+                    this.score = Math.max(0, this.score - 20); // Penalty
+                    this.updateStats();
+                }
+            },
+
+            showFeedback: function(isCorrect, message) {
+                const overlay = document.getElementById('feedback-overlay');
+                const icon = document.getElementById('feedback-icon');
+                const title = document.getElementById('feedback-title');
+                const msg = document.getElementById('feedback-message');
+                const btn = document.getElementById('feedback-btn');
+
+                overlay.style.display = 'flex';
+                icon.textContent = isCorrect ? '🎉' : '⚠️';
+                title.textContent = isCorrect ? '決策正確' : '決策失誤';
+                title.style.color = isCorrect ? 'var(--success)' : 'var(--error)';
+                msg.innerHTML = message;
+
+                if (isCorrect) {
+                    if (this.currentLevelIndex === levels.length - 1) {
+                        btn.textContent = "領取結業證書";
+                        btn.onclick = () => this.finishGame();
+                    } else {
+                        btn.textContent = "下一關";
+                        btn.onclick = () => {
+                            overlay.style.display = 'none';
+                            this.currentLevelIndex++;
+                            this.renderLevel();
+                        };
+                    }
+                } else {
+                    btn.textContent = "再試一次";
+                    btn.onclick = () => {
+                        overlay.style.display = 'none';
+                        this.renderLevel(); // Reset buttons
+                    };
+                }
+            },
+
+            updateStats: function() {
+                document.getElementById('score-display').textContent = this.score;
+            },
+
+            finishGame: function() {
+                const overlay = document.getElementById('feedback-overlay');
+                overlay.innerHTML = `
+                    <div class="feedback-card">
+                        <span class="feedback-icon">🏆</span>
+                        <h2 class="feedback-title" style="color:var(--gold)">恭喜通關！</h2>
+                        <p class="feedback-message">
+                            您已成功通過所有管理會計決策挑戰。<br>
+                            最終得分：<strong style="color:var(--gold); font-size:1.5rem">${this.score}</strong>
+                        </p>
+                        <button class="next-btn" onclick="location.reload()">重新挑戰</button>
+                    </div>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>
